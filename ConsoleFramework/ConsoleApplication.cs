@@ -18,35 +18,6 @@ using Xaml;
 namespace ConsoleFramework
 {
 
-    /// <summary>
-    /// Gets a pre-started window
-    /// </summary>
-    public static class EasyAPI
-    {
-        public struct CFCtl
-        {
-            public string Name { get; set; }
-            public object Type { get; set; }
-        }
-
-        public struct CFState
-        {
-            public WindowsHost WindowsHost { get; set; }
-            public Window Window { get; set; }
-            //public  Handles { get; set; }
-        }
-
-        public static CFState GetState(string xmlRes, [Optional] object dataContext)
-        {
-            if (dataContext == null)
-                dataContext = null;
-            var cfState = new CFState();
-            cfState.WindowsHost = new WindowsHost();
-            cfState.Window = (Window)ConsoleApplication.LoadFromXaml(xmlRes, dataContext);
-            return cfState;
-        }
-    }
-
     public class TerminalSizeChangedEventArgs : EventArgs
     {
         public readonly int Width;
@@ -86,10 +57,10 @@ namespace ConsoleFramework
         /// </summary>
         public void Maximize( ) {
             if ( usingLinux ) {
-				// Doesn't work in Konsole
-				Console.Write ("\x1B[9;1t");
-				return;
-			}
+                // Doesn't work in Konsole
+                Console.Write ("\x1B[9;1t");
+                return;
+            }
             
             if ( maximized ) return;
             //
@@ -115,10 +86,10 @@ namespace ConsoleFramework
         /// </summary>
         public void Restore( ) {
             if (usingLinux) {
-				// Doesn't work in Konsole
-				Console.Write ("\x1B[9;0t");
-				return;
-			}
+                // Doesn't work in Konsole
+                Console.Write ("\x1B[9;0t");
+                return;
+            }
 
             if ( !maximized ) return;
             //
@@ -166,10 +137,10 @@ namespace ConsoleFramework
 
         private Size userCanvasSize;
 
-		/// <summary>
-		/// Gets or sets a size of canvas. Whet set, old canvas image will be
-		/// copied to new one.
-		/// </summary>
+        /// <summary>
+        /// Gets or sets a size of canvas. Whet set, old canvas image will be
+        /// copied to new one.
+        /// </summary>
         public Size CanvasSize {
             get {
                 if ( running && userCanvasSize.IsEmpty )
@@ -185,10 +156,10 @@ namespace ConsoleFramework
         }
 
         private Rect userRootElementRect;
-		/// <summary>
-		/// Gets or sets the root element rect.
-		/// When set, root element will be added to invalidation queue automatically.
-		/// </summary>
+        /// <summary>
+        /// Gets or sets the root element rect.
+        /// When set, root element will be added to invalidation queue automatically.
+        /// </summary>
         public Rect RootElementRect {
             get {
                 if ( running && userRootElementRect.IsEmpty ) {
@@ -228,8 +199,8 @@ namespace ConsoleFramework
             }
         }
 
-		private static readonly bool usingLinux;
-		private static readonly bool isDarwin;
+        private static readonly bool usingLinux;
+        private static readonly bool isDarwin;
         private static readonly bool usingJsil;
 
         public static bool IsRunningOnJsil() {
@@ -251,13 +222,13 @@ namespace ConsoleFramework
                     usingLinux = false;
                     break;
                 case PlatformID.Unix:
-					usingLinux = true;
+                    usingLinux = true;
 #if !WIN32
-					Utsname uname;
-					Syscall.uname(out uname);
-					if (uname.sysname == "Darwin") {
-						isDarwin = true;
-					}
+                    Utsname uname;
+                    Syscall.uname(out uname);
+                    if (uname.sysname == "Darwin") {
+                        isDarwin = true;
+                    }
 #endif
                     break;
                 case PlatformID.MacOSX:
@@ -265,7 +236,7 @@ namespace ConsoleFramework
                     throw new NotSupportedException();
             }
         }
-		
+        
         private ConsoleApplication() {
             eventManager = new EventManager();
             focusManager = new FocusManager(eventManager);
@@ -320,12 +291,12 @@ namespace ConsoleFramework
         /// Application shutdowns after that.
         /// </summary>
         public void Exit() {
-			if (usingLinux) {
-				int res = Libc.writeInt64(pipeFds[1], 1);
+            if (usingLinux) {
+                int res = Libc.writeInt64(pipeFds[1], 1);
                 if (-1 == res) throw new InvalidOperationException("Cannot write to self-pipe.");
-			} else {
-            	exitWaitHandle.Set();
-			}
+            } else {
+                exitWaitHandle.Set();
+            }
         }
 
         private readonly Renderer renderer = new Renderer();
@@ -359,15 +330,15 @@ namespace ConsoleFramework
                 return eventManager;
             }
         }
-		
+        
         internal void SetCursorPosition (Point position)
-		{
-			if (!usingLinux) {				
-				Win32.SetConsoleCursorPosition (stdOutputHandle, new COORD ((short)position.x, (short)position.y));
-			} else {
-				NCurses.move (position.y, position.x);
-				NCurses.refresh ();
-			}
+        {
+            if (!usingLinux) {				
+                Win32.SetConsoleCursorPosition (stdOutputHandle, new COORD ((short)position.x, (short)position.y));
+            } else {
+                NCurses.move (position.y, position.x);
+                NCurses.refresh ();
+            }
         }
 
         /// <summary>
@@ -384,16 +355,16 @@ namespace ConsoleFramework
         /// Делает курсор консоли видимым и устанавливает значение CursorIsVisible в true.
         /// </summary>
         internal void ShowCursor ()
-		{
-			if (!usingLinux) {
-				CONSOLE_CURSOR_INFO consoleCursorInfo = new CONSOLE_CURSOR_INFO {
-	                Size = 5,
-	                Visible = true
-	            };
-				Win32.SetConsoleCursorInfo (stdOutputHandle, ref consoleCursorInfo);
-			} else {
-				NCurses.curs_set (CursorVisibility.Visible);
-			}
+        {
+            if (!usingLinux) {
+                CONSOLE_CURSOR_INFO consoleCursorInfo = new CONSOLE_CURSOR_INFO {
+                    Size = 5,
+                    Visible = true
+                };
+                Win32.SetConsoleCursorInfo (stdOutputHandle, ref consoleCursorInfo);
+            } else {
+                NCurses.curs_set (CursorVisibility.Visible);
+            }
             CursorIsVisible = true;
         }
 
@@ -402,137 +373,137 @@ namespace ConsoleFramework
         /// CursorIsVisible в false.
         /// </summary>
         internal void HideCursor ()
-		{
-			if (!usingLinux) {
-				CONSOLE_CURSOR_INFO consoleCursorInfo = new CONSOLE_CURSOR_INFO {
-	                Size = 5,
-	                Visible = false
-	            };
-				Win32.SetConsoleCursorInfo (stdOutputHandle, ref consoleCursorInfo);
-			} else {
-				NCurses.curs_set (CursorVisibility.Invisible);
-			}
+        {
+            if (!usingLinux) {
+                CONSOLE_CURSOR_INFO consoleCursorInfo = new CONSOLE_CURSOR_INFO {
+                    Size = 5,
+                    Visible = false
+                };
+                Win32.SetConsoleCursorInfo (stdOutputHandle, ref consoleCursorInfo);
+            } else {
+                NCurses.curs_set (CursorVisibility.Invisible);
+            }
             CursorIsVisible = false;
         }
-		
+        
         /// <summary>
         /// Runs application using specified control as root control.
         /// Application will run until method <see cref="Exit"/> is called.
         /// </summary>
         /// <param name="control"></param>
-		public void Run(Control control) {
-			try {
-				if (usingLinux) {
-					runLinux(control);
-				} else {
-					runWindows(control);
-				}
-			} finally {
-				this.running = false;
-				this.mainThreadId = null;
-			}
-		}
+        public void Run(Control control) {
+            try {
+                if (usingLinux) {
+                    runLinux(control);
+                } else {
+                    runWindows(control);
+                }
+            } finally {
+                this.running = false;
+                this.mainThreadId = null;
+            }
+        }
 
         public void Run( Control control, Size canvasSize, Rect rectToUse ) {
-			userCanvasSize = canvasSize;
-			userRootElementRect = rectToUse;
-			Run(control);
+            userCanvasSize = canvasSize;
+            userRootElementRect = rectToUse;
+            Run(control);
         }
-		
-		/// <summary>
-		/// File descriptors for self-pipe.
-		/// First descriptor is used to read from pipe, second - to write.
-		/// </summary>
-		private readonly int[] pipeFds = new int[2];
-		private IntPtr termkeyHandle = IntPtr.Zero;
+        
+        /// <summary>
+        /// File descriptors for self-pipe.
+        /// First descriptor is used to read from pipe, second - to write.
+        /// </summary>
+        private readonly int[] pipeFds = new int[2];
+        private IntPtr termkeyHandle = IntPtr.Zero;
 
         private void runLinux (Control control) {
-			this.mainControl = control;
-			
-		    if ( userCanvasSize.IsEmpty ) {
-		        // Create physical canvas with actual terminal size
-		        winsize ws = Libc.GetTerminalSize( isDarwin );
-		        canvas = new PhysicalCanvas( ws.ws_col, ws.ws_row );
-		    } else {
-				canvas = new PhysicalCanvas( userCanvasSize.Width, userCanvasSize.Height );
-		    }
-		    renderer.Canvas = canvas;
-		    renderer.RootElementRect = userRootElementRect.IsEmpty 
+            this.mainControl = control;
+            
+            if ( userCanvasSize.IsEmpty ) {
+                // Create physical canvas with actual terminal size
+                winsize ws = Libc.GetTerminalSize( isDarwin );
+                canvas = new PhysicalCanvas( ws.ws_col, ws.ws_row );
+            } else {
+                canvas = new PhysicalCanvas( userCanvasSize.Width, userCanvasSize.Height );
+            }
+            renderer.Canvas = canvas;
+            renderer.RootElementRect = userRootElementRect.IsEmpty 
                 ? new Rect( canvas.Size ) : userRootElementRect;
-			renderer.RootElement = mainControl;
-			//
-			mainControl.Invalidate ();
-			
-			// Terminal initialization sequence
-			
-			// This is magic workaround to avoid messing up terminal after program finish
-			// The bug is described at https://bugzilla.xamarin.com/show_bug.cgi?id=15118
-			bool ignored = Console.KeyAvailable;
-			
-			IntPtr stdscr = NCurses.initscr ();
-			NCurses.cbreak ();
-			NCurses.noecho ();
-			NCurses.nonl ();
-			NCurses.intrflush (stdscr, false);
-			NCurses.keypad (stdscr, true);
-			NCurses.start_color ();
-			
-			HideCursor ();
-		    try {
-		        renderer.UpdateLayout( );
+            renderer.RootElement = mainControl;
+            //
+            mainControl.Invalidate ();
+            
+            // Terminal initialization sequence
+            
+            // This is magic workaround to avoid messing up terminal after program finish
+            // The bug is described at https://bugzilla.xamarin.com/show_bug.cgi?id=15118
+            bool ignored = Console.KeyAvailable;
+            
+            IntPtr stdscr = NCurses.initscr ();
+            NCurses.cbreak ();
+            NCurses.noecho ();
+            NCurses.nonl ();
+            NCurses.intrflush (stdscr, false);
+            NCurses.keypad (stdscr, true);
+            NCurses.start_color ();
+            
+            HideCursor ();
+            try {
+                renderer.UpdateLayout( );
                 renderer.FinallyApplyChangesToCanvas(  );
 
-		        termkeyHandle = LibTermKey.termkey_new( 0, TermKeyFlag.TERMKEY_FLAG_SPACESYMBOL );
+                termkeyHandle = LibTermKey.termkey_new( 0, TermKeyFlag.TERMKEY_FLAG_SPACESYMBOL );
 
-		        // Setup the input mode
-		        Console.Write( "\x1B[?1002h" );
-		        pollfd fd = new pollfd( );
-		        fd.fd = 0;
-		        fd.events = POLL_EVENTS.POLLIN;
+                // Setup the input mode
+                Console.Write( "\x1B[?1002h" );
+                pollfd fd = new pollfd( );
+                fd.fd = 0;
+                fd.events = POLL_EVENTS.POLLIN;
 
-		        pollfd[ ] fds = new pollfd[ 2 ];
-		        fds[ 0 ] = fd;
-		        fds[ 1 ] = new pollfd( );
-		        int pipeResult = Libc.pipe( pipeFds );
-		        if ( pipeResult == -1 ) {
-		            throw new InvalidOperationException( "Cannot create self-pipe." );
-		        }
-		        fds[ 1 ].fd = pipeFds[ 0 ];
-		        fds[ 1 ].events = POLL_EVENTS.POLLIN;
+                pollfd[ ] fds = new pollfd[ 2 ];
+                fds[ 0 ] = fd;
+                fds[ 1 ] = new pollfd( );
+                int pipeResult = Libc.pipe( pipeFds );
+                if ( pipeResult == -1 ) {
+                    throw new InvalidOperationException( "Cannot create self-pipe." );
+                }
+                fds[ 1 ].fd = pipeFds[ 0 ];
+                fds[ 1 ].events = POLL_EVENTS.POLLIN;
 
-		        try {
+                try {
 #if !WIN32
                     // Catch SIGWINCH to handle terminal resizing
-			        UnixSignal[] signals = new UnixSignal [] {
-			            new UnixSignal (Signum.SIGWINCH)
-			        };
-			        Thread signal_thread = new Thread (delegate () {
-				        while (true) {
-					        // Wait for a signal to be delivered
-					        int index = UnixSignal.WaitAny (signals, -1);
-					        Signum signal = signals [index].Signum;
-					        Libc.writeInt64 (pipeFds[1], 2);
-				        }
-			        }
-			        );
-			        signal_thread.IsBackground = false;
-			        signal_thread.Start ();
+                    UnixSignal[] signals = new UnixSignal [] {
+                        new UnixSignal (Signum.SIGWINCH)
+                    };
+                    Thread signal_thread = new Thread (delegate () {
+                        while (true) {
+                            // Wait for a signal to be delivered
+                            int index = UnixSignal.WaitAny (signals, -1);
+                            Signum signal = signals [index].Signum;
+                            Libc.writeInt64 (pipeFds[1], 2);
+                        }
+                    }
+                    );
+                    signal_thread.IsBackground = false;
+                    signal_thread.Start ();
 #endif
-		            TermKeyKey key = new TermKeyKey( );
-					//
-					this.running = true;
-					this.mainThreadId = Thread.CurrentThread.ManagedThreadId;
-					//
-					int nextwait = -1;
-		            while ( true ) {
-		                int pollRes = Libc.poll( fds, 2, nextwait );
-		                if ( pollRes == 0 ) {
-							if (nextwait == -1)
-								throw new InvalidOperationException( "Assertion failed." );
-							if (TermKeyResult.TERMKEY_RES_KEY == LibTermKey.termkey_getkey_force(termkeyHandle, ref key) ) {
-								processLinuxInput( key );
-							}
-						}
+                    TermKeyKey key = new TermKeyKey( );
+                    //
+                    this.running = true;
+                    this.mainThreadId = Thread.CurrentThread.ManagedThreadId;
+                    //
+                    int nextwait = -1;
+                    while ( true ) {
+                        int pollRes = Libc.poll( fds, 2, nextwait );
+                        if ( pollRes == 0 ) {
+                            if (nextwait == -1)
+                                throw new InvalidOperationException( "Assertion failed." );
+                            if (TermKeyResult.TERMKEY_RES_KEY == LibTermKey.termkey_getkey_force(termkeyHandle, ref key) ) {
+                                processLinuxInput( key );
+                            }
+                        }
                         if ( pollRes == -1 ) {
                             int errorCode = Marshal.GetLastWin32Error();
                             if ( errorCode != Libc.EINTR ) {
@@ -540,49 +511,49 @@ namespace ConsoleFramework
                             }
                         }
 
-		                if ( fds[ 1 ].revents != POLL_EVENTS.NONE ) {
-		                    UInt64 u;
-		                    Libc.readInt64( fds[ 1 ].fd, out u );
-		                    if ( u == 1 ) {
-		                        // Exit from application
+                        if ( fds[ 1 ].revents != POLL_EVENTS.NONE ) {
+                            UInt64 u;
+                            Libc.readInt64( fds[ 1 ].fd, out u );
+                            if ( u == 1 ) {
+                                // Exit from application
 #if !WIN32
-						        signal_thread.Abort ();
+                                signal_thread.Abort ();
 #endif
-		                        break;
-		                    }
-		                    if ( u == 2 ) {
-		                        // Get new term size and process appropriate INPUT_RECORD event
-		                        INPUT_RECORD inputRecord = new INPUT_RECORD( );
-		                        inputRecord.EventType = EventType.WINDOW_BUFFER_SIZE_EVENT;
+                                break;
+                            }
+                            if ( u == 2 ) {
+                                // Get new term size and process appropriate INPUT_RECORD event
+                                INPUT_RECORD inputRecord = new INPUT_RECORD( );
+                                inputRecord.EventType = EventType.WINDOW_BUFFER_SIZE_EVENT;
 
-		                        winsize ws = Libc.GetTerminalSize( isDarwin );
+                                winsize ws = Libc.GetTerminalSize( isDarwin );
 
-		                        inputRecord.WindowBufferSizeEvent.dwSize.X = ( short ) ws.ws_col;
-		                        inputRecord.WindowBufferSizeEvent.dwSize.Y = ( short ) ws.ws_row;
-		                        processInputEvent( inputRecord );
-		                    }
-							if (u == 3 ) {
-								// It is signal from async actions invocation stuff
-							}
-		                }
+                                inputRecord.WindowBufferSizeEvent.dwSize.X = ( short ) ws.ws_col;
+                                inputRecord.WindowBufferSizeEvent.dwSize.Y = ( short ) ws.ws_row;
+                                processInputEvent( inputRecord );
+                            }
+                            if (u == 3 ) {
+                                // It is signal from async actions invocation stuff
+                            }
+                        }
 
-		                if ( ( fds[ 0 ].revents & POLL_EVENTS.POLLIN ) == POLL_EVENTS.POLLIN ||
-		                     ( fds[ 0 ].revents & POLL_EVENTS.POLLHUP ) == POLL_EVENTS.POLLHUP ||
-		                     ( fds[ 0 ].revents & POLL_EVENTS.POLLERR ) == POLL_EVENTS.POLLERR ) {
-		                    LibTermKey.termkey_advisereadable( termkeyHandle );
-		                }
+                        if ( ( fds[ 0 ].revents & POLL_EVENTS.POLLIN ) == POLL_EVENTS.POLLIN ||
+                             ( fds[ 0 ].revents & POLL_EVENTS.POLLHUP ) == POLL_EVENTS.POLLHUP ||
+                             ( fds[ 0 ].revents & POLL_EVENTS.POLLERR ) == POLL_EVENTS.POLLERR ) {
+                            LibTermKey.termkey_advisereadable( termkeyHandle );
+                        }
 
-						TermKeyResult result = ( LibTermKey.termkey_getkey( termkeyHandle, ref key ) );
-		                while (result == TermKeyResult.TERMKEY_RES_KEY ) {
-		                    processLinuxInput( key );
-							result = ( LibTermKey.termkey_getkey( termkeyHandle, ref key ) );
-		                }
+                        TermKeyResult result = ( LibTermKey.termkey_getkey( termkeyHandle, ref key ) );
+                        while (result == TermKeyResult.TERMKEY_RES_KEY ) {
+                            processLinuxInput( key );
+                            result = ( LibTermKey.termkey_getkey( termkeyHandle, ref key ) );
+                        }
 
-						if (result == TermKeyResult.TERMKEY_RES_AGAIN) {
-							nextwait = LibTermKey.termkey_get_waittime(termkeyHandle);
-						} else {
-							nextwait = -1;
-						}
+                        if (result == TermKeyResult.TERMKEY_RES_AGAIN) {
+                            nextwait = LibTermKey.termkey_get_waittime(termkeyHandle);
+                        } else {
+                            nextwait = -1;
+                        }
 
                         while ( true ) {
                             bool anyInvokeActions = isAnyInvokeActions( );
@@ -598,169 +569,169 @@ namespace ConsoleFramework
                         }
 
                         renderer.FinallyApplyChangesToCanvas( );
-		            }
+                    }
 
-		        } finally {
-		            LibTermKey.termkey_destroy( termkeyHandle );
-		            Libc.close( pipeFds[ 0 ] );
-		            Libc.close( pipeFds[ 1 ] );
-		            Console.Write( "\x1B[?1002l" );
-		        }
-		    } finally {
-		        // Restore cursor visibility before exit
-		        ShowCursor( );
-		        NCurses.endwin( );
-		    }
+                } finally {
+                    LibTermKey.termkey_destroy( termkeyHandle );
+                    Libc.close( pipeFds[ 0 ] );
+                    Libc.close( pipeFds[ 1 ] );
+                    Console.Write( "\x1B[?1002l" );
+                }
+            } finally {
+                // Restore cursor visibility before exit
+                ShowCursor( );
+                NCurses.endwin( );
+            }
 
             renderer.RootElement = null;
         }
-		
-		private void processLinuxInput (TermKeyKey key)
-		{
-			// If any special button has been pressed (Tab, Enter, etc)
-			// we should convert its code to INPUT_RECORD.KeyEvent
-			// Because INPUT_RECORD.KeyEvent depends on Windows' scan codes,
-			// we convert codes retrieved from LibTermKey to Windows virtual scan codes
-			// In the future, this logic may be changed (for example, both Windows and Linux
-			// raw codes can be converted into ConsoleFramework's own abstract enum)
-			if (key.type == TermKeyType.TERMKEY_TYPE_KEYSYM) {
-				INPUT_RECORD inputRecord = new INPUT_RECORD ();
-				inputRecord.EventType = EventType.KEY_EVENT;
-				inputRecord.KeyEvent.bKeyDown = true;
-				inputRecord.KeyEvent.wRepeatCount = 1;
-				switch (key.code.sym) {
-				case TermKeySym.TERMKEY_SYM_TAB:
-					inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Tab;
-					break;
-				case TermKeySym.TERMKEY_SYM_ENTER:
-					inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Return;
-					break;
-				// in gnome-terminal it is backspace by default
-				// (see default compatibility settings in Profile's settings)
-				case TermKeySym.TERMKEY_SYM_DEL:
-				case TermKeySym.TERMKEY_SYM_BACKSPACE:
-					inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Back;
-					break;
-				case TermKeySym.TERMKEY_SYM_DELETE:
-					inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Delete;
-					break;
-				case TermKeySym.TERMKEY_SYM_HOME:
-					inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Home;
-					break;
-				case TermKeySym.TERMKEY_SYM_END:
-					inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.End;
-					break;
-				case TermKeySym.TERMKEY_SYM_PAGEUP:
-					inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Prior;
-					break;
-				case TermKeySym.TERMKEY_SYM_PAGEDOWN:
+        
+        private void processLinuxInput (TermKeyKey key)
+        {
+            // If any special button has been pressed (Tab, Enter, etc)
+            // we should convert its code to INPUT_RECORD.KeyEvent
+            // Because INPUT_RECORD.KeyEvent depends on Windows' scan codes,
+            // we convert codes retrieved from LibTermKey to Windows virtual scan codes
+            // In the future, this logic may be changed (for example, both Windows and Linux
+            // raw codes can be converted into ConsoleFramework's own abstract enum)
+            if (key.type == TermKeyType.TERMKEY_TYPE_KEYSYM) {
+                INPUT_RECORD inputRecord = new INPUT_RECORD ();
+                inputRecord.EventType = EventType.KEY_EVENT;
+                inputRecord.KeyEvent.bKeyDown = true;
+                inputRecord.KeyEvent.wRepeatCount = 1;
+                switch (key.code.sym) {
+                case TermKeySym.TERMKEY_SYM_TAB:
+                    inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Tab;
+                    break;
+                case TermKeySym.TERMKEY_SYM_ENTER:
+                    inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Return;
+                    break;
+                // in gnome-terminal it is backspace by default
+                // (see default compatibility settings in Profile's settings)
+                case TermKeySym.TERMKEY_SYM_DEL:
+                case TermKeySym.TERMKEY_SYM_BACKSPACE:
+                    inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Back;
+                    break;
+                case TermKeySym.TERMKEY_SYM_DELETE:
+                    inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Delete;
+                    break;
+                case TermKeySym.TERMKEY_SYM_HOME:
+                    inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Home;
+                    break;
+                case TermKeySym.TERMKEY_SYM_END:
+                    inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.End;
+                    break;
+                case TermKeySym.TERMKEY_SYM_PAGEUP:
+                    inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Prior;
+                    break;
+                case TermKeySym.TERMKEY_SYM_PAGEDOWN:
                     inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Next;
-					break;
-				case TermKeySym.TERMKEY_SYM_SPACE:
-					inputRecord.KeyEvent.UnicodeChar = ' ';
-					inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Space;
-					break;
-				case TermKeySym.TERMKEY_SYM_ESCAPE:
-					inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Escape;
-					break;
-				case TermKeySym.TERMKEY_SYM_INSERT:
-					inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Insert;
-					break;
-				case TermKeySym.TERMKEY_SYM_UP:
-					inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Up;
-					break;
-				case TermKeySym.TERMKEY_SYM_DOWN:
-					inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Down;
-					break;
-				case TermKeySym.TERMKEY_SYM_LEFT:
-					inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Left;
-					break;
-				case TermKeySym.TERMKEY_SYM_RIGHT:
-					inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Right;
-					break;
-				default:
-					throw new NotSupportedException ("Not supported keyboard code detected: " + key.code.sym);
-				}
-				inputRecord.KeyEvent.dwControlKeyState = 0;
-				if ((key.modifiers & 4) == 4) {
-					inputRecord.KeyEvent.dwControlKeyState |= ControlKeyState.LEFT_CTRL_PRESSED;
-				}
-				if ((key.modifiers & 2) == 2) {
-					inputRecord.KeyEvent.dwControlKeyState |= ControlKeyState.LEFT_ALT_PRESSED;
-				}
-				processInputEvent (inputRecord);
-			} else if (key.type == TermKeyType.TERMKEY_TYPE_UNICODE) {
-				byte[] data = new byte[7];
-				data[0] = key.utf8_0;
-				data[1] = key.utf8_1;
-				data[2] = key.utf8_2;
-				data[3] = key.utf8_3;
-				data[4] = key.utf8_4;
-				data[5] = key.utf8_5;
-				data[6] = key.utf8_6;
-				string d = System.Text.Encoding.UTF8.GetString(data);
-				char unicodeCharacter = d[0];
-				INPUT_RECORD inputRecord = new INPUT_RECORD();
-				inputRecord.EventType = EventType.KEY_EVENT;
-				inputRecord.KeyEvent.bKeyDown = true;
-				inputRecord.KeyEvent.wRepeatCount = 1;
-				inputRecord.KeyEvent.UnicodeChar = unicodeCharacter;
-				inputRecord.KeyEvent.dwControlKeyState = 0;
-				if (char.IsLetterOrDigit( unicodeCharacter )) {
-					if (char.IsDigit( unicodeCharacter)) {
-						inputRecord.KeyEvent.wVirtualKeyCode =
-							(VirtualKeys) (unicodeCharacter - '0' + (int) VirtualKeys.N0);
-					} else {
-						char lowercased = char.ToLowerInvariant( unicodeCharacter );
+                    break;
+                case TermKeySym.TERMKEY_SYM_SPACE:
+                    inputRecord.KeyEvent.UnicodeChar = ' ';
+                    inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Space;
+                    break;
+                case TermKeySym.TERMKEY_SYM_ESCAPE:
+                    inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Escape;
+                    break;
+                case TermKeySym.TERMKEY_SYM_INSERT:
+                    inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Insert;
+                    break;
+                case TermKeySym.TERMKEY_SYM_UP:
+                    inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Up;
+                    break;
+                case TermKeySym.TERMKEY_SYM_DOWN:
+                    inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Down;
+                    break;
+                case TermKeySym.TERMKEY_SYM_LEFT:
+                    inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Left;
+                    break;
+                case TermKeySym.TERMKEY_SYM_RIGHT:
+                    inputRecord.KeyEvent.wVirtualKeyCode = VirtualKeys.Right;
+                    break;
+                default:
+                    throw new NotSupportedException ("Not supported keyboard code detected: " + key.code.sym);
+                }
+                inputRecord.KeyEvent.dwControlKeyState = 0;
+                if ((key.modifiers & 4) == 4) {
+                    inputRecord.KeyEvent.dwControlKeyState |= ControlKeyState.LEFT_CTRL_PRESSED;
+                }
+                if ((key.modifiers & 2) == 2) {
+                    inputRecord.KeyEvent.dwControlKeyState |= ControlKeyState.LEFT_ALT_PRESSED;
+                }
+                processInputEvent (inputRecord);
+            } else if (key.type == TermKeyType.TERMKEY_TYPE_UNICODE) {
+                byte[] data = new byte[7];
+                data[0] = key.utf8_0;
+                data[1] = key.utf8_1;
+                data[2] = key.utf8_2;
+                data[3] = key.utf8_3;
+                data[4] = key.utf8_4;
+                data[5] = key.utf8_5;
+                data[6] = key.utf8_6;
+                string d = System.Text.Encoding.UTF8.GetString(data);
+                char unicodeCharacter = d[0];
+                INPUT_RECORD inputRecord = new INPUT_RECORD();
+                inputRecord.EventType = EventType.KEY_EVENT;
+                inputRecord.KeyEvent.bKeyDown = true;
+                inputRecord.KeyEvent.wRepeatCount = 1;
+                inputRecord.KeyEvent.UnicodeChar = unicodeCharacter;
+                inputRecord.KeyEvent.dwControlKeyState = 0;
+                if (char.IsLetterOrDigit( unicodeCharacter )) {
+                    if (char.IsDigit( unicodeCharacter)) {
+                        inputRecord.KeyEvent.wVirtualKeyCode =
+                            (VirtualKeys) (unicodeCharacter - '0' + (int) VirtualKeys.N0);
+                    } else {
+                        char lowercased = char.ToLowerInvariant( unicodeCharacter );
 
-						// Only english characters can be converted to VirtualKeys
-						if (lowercased >= 'a' && lowercased <= 'z') {
-							inputRecord.KeyEvent.wVirtualKeyCode =
-								(VirtualKeys) (lowercased - 'a' + (int) VirtualKeys.A );
-						}
-					}
-				}
-				if ((key.modifiers & 4) == 4) {
-					inputRecord.KeyEvent.dwControlKeyState |= ControlKeyState.LEFT_CTRL_PRESSED;
-				}
-				if ((key.modifiers & 2) == 2) {
-					inputRecord.KeyEvent.dwControlKeyState |= ControlKeyState.LEFT_ALT_PRESSED;
-				}
+                        // Only english characters can be converted to VirtualKeys
+                        if (lowercased >= 'a' && lowercased <= 'z') {
+                            inputRecord.KeyEvent.wVirtualKeyCode =
+                                (VirtualKeys) (lowercased - 'a' + (int) VirtualKeys.A );
+                        }
+                    }
+                }
+                if ((key.modifiers & 4) == 4) {
+                    inputRecord.KeyEvent.dwControlKeyState |= ControlKeyState.LEFT_CTRL_PRESSED;
+                }
+                if ((key.modifiers & 2) == 2) {
+                    inputRecord.KeyEvent.dwControlKeyState |= ControlKeyState.LEFT_ALT_PRESSED;
+                }
                 // todo : remove hardcoded exit combo after testing
-				if (unicodeCharacter == 'd' && key.modifiers == 4) {
-					Exit ();
-				}
-				processInputEvent(inputRecord);
-				//
-			} else if (key.type == TermKeyType.TERMKEY_TYPE_MOUSE) {
-				TermKeyMouseEvent ev;
-				int button;
-				int line, col;
-				LibTermKey.termkey_interpret_mouse(termkeyHandle, ref key, out ev, out button, out line, out col);
-				//
-				INPUT_RECORD inputRecord = new INPUT_RECORD();
-				inputRecord.EventType = EventType.MOUSE_EVENT;
-				if (ev == TermKeyMouseEvent.TERMKEY_MOUSE_PRESS || ev == TermKeyMouseEvent.TERMKEY_MOUSE_RELEASE)
-					inputRecord.MouseEvent.dwEventFlags = MouseEventFlags.PRESSED_OR_RELEASED;
-				if (ev == TermKeyMouseEvent.TERMKEY_MOUSE_DRAG)
-					inputRecord.MouseEvent.dwEventFlags = MouseEventFlags.MOUSE_MOVED;
-				inputRecord.MouseEvent.dwMousePosition = new COORD((short) (col - 1), (short) (line - 1));
-				if (ev == TermKeyMouseEvent.TERMKEY_MOUSE_RELEASE) {
-					inputRecord.MouseEvent.dwButtonState = 0;
-				} else if (ev == TermKeyMouseEvent.TERMKEY_MOUSE_DRAG || ev == TermKeyMouseEvent.TERMKEY_MOUSE_PRESS) {
-					if (1 == button) {
-						inputRecord.MouseEvent.dwButtonState = MOUSE_BUTTON_STATE.FROM_LEFT_1ST_BUTTON_PRESSED;
-					} else if (2 == button) {
-						inputRecord.MouseEvent.dwButtonState = MOUSE_BUTTON_STATE.FROM_LEFT_2ND_BUTTON_PRESSED;
-					} else if (3 == button) {
-						inputRecord.MouseEvent.dwButtonState = MOUSE_BUTTON_STATE.RIGHTMOST_BUTTON_PRESSED;
-					}
-				}
-				//
-				processInputEvent(inputRecord);
-			}
-		}
-		
+                if (unicodeCharacter == 'd' && key.modifiers == 4) {
+                    Exit ();
+                }
+                processInputEvent(inputRecord);
+                //
+            } else if (key.type == TermKeyType.TERMKEY_TYPE_MOUSE) {
+                TermKeyMouseEvent ev;
+                int button;
+                int line, col;
+                LibTermKey.termkey_interpret_mouse(termkeyHandle, ref key, out ev, out button, out line, out col);
+                //
+                INPUT_RECORD inputRecord = new INPUT_RECORD();
+                inputRecord.EventType = EventType.MOUSE_EVENT;
+                if (ev == TermKeyMouseEvent.TERMKEY_MOUSE_PRESS || ev == TermKeyMouseEvent.TERMKEY_MOUSE_RELEASE)
+                    inputRecord.MouseEvent.dwEventFlags = MouseEventFlags.PRESSED_OR_RELEASED;
+                if (ev == TermKeyMouseEvent.TERMKEY_MOUSE_DRAG)
+                    inputRecord.MouseEvent.dwEventFlags = MouseEventFlags.MOUSE_MOVED;
+                inputRecord.MouseEvent.dwMousePosition = new COORD((short) (col - 1), (short) (line - 1));
+                if (ev == TermKeyMouseEvent.TERMKEY_MOUSE_RELEASE) {
+                    inputRecord.MouseEvent.dwButtonState = 0;
+                } else if (ev == TermKeyMouseEvent.TERMKEY_MOUSE_DRAG || ev == TermKeyMouseEvent.TERMKEY_MOUSE_PRESS) {
+                    if (1 == button) {
+                        inputRecord.MouseEvent.dwButtonState = MOUSE_BUTTON_STATE.FROM_LEFT_1ST_BUTTON_PRESSED;
+                    } else if (2 == button) {
+                        inputRecord.MouseEvent.dwButtonState = MOUSE_BUTTON_STATE.FROM_LEFT_2ND_BUTTON_PRESSED;
+                    } else if (3 == button) {
+                        inputRecord.MouseEvent.dwButtonState = MOUSE_BUTTON_STATE.RIGHTMOST_BUTTON_PRESSED;
+                    }
+                }
+                //
+                processInputEvent(inputRecord);
+            }
+        }
+        
         private void runWindows(Control control) {
             this.mainControl = control;
             //
@@ -796,7 +767,7 @@ namespace ConsoleFramework
             // Fill the canvas by default
             renderer.RootElementRect = userRootElementRect.IsEmpty 
                 ? new Rect( new Point(0, 0), canvas.Size ) : userRootElementRect;
-			renderer.RootElement = mainControl;
+            renderer.RootElement = mainControl;
             //
             mainControl.Invalidate();
             renderer.UpdateLayout();
@@ -806,8 +777,8 @@ namespace ConsoleFramework
             HideCursor();
             
             
-			this.running = true;
-			this.mainThreadId = Thread.CurrentThread.ManagedThreadId;
+            this.running = true;
+            this.mainThreadId = Thread.CurrentThread.ManagedThreadId;
             //
             while (true) {
                 // 100 ms instead of Win32.INFINITE to check console window Zoomed and Iconic
@@ -913,30 +884,30 @@ namespace ConsoleFramework
         private void processInputEvent(INPUT_RECORD inputRecord) {
             if ( inputRecord.EventType == EventType.WINDOW_BUFFER_SIZE_EVENT ) {
 
-				if ( usingLinux ) {
-					// Reinitializing ncurses to deal with new dimensions
-					// http://stackoverflow.com/questions/13707137/ncurses-resizing-glitch
-					NCurses.endwin();
-					// Needs to be called after an endwin() so ncurses will initialize
-					// itself with the new terminal dimensions.
-					NCurses.refresh();
-					NCurses.clear();
-				}
-				
-				COORD dwSize = inputRecord.WindowBufferSizeEvent.dwSize;
+                if ( usingLinux ) {
+                    // Reinitializing ncurses to deal with new dimensions
+                    // http://stackoverflow.com/questions/13707137/ncurses-resizing-glitch
+                    NCurses.endwin();
+                    // Needs to be called after an endwin() so ncurses will initialize
+                    // itself with the new terminal dimensions.
+                    NCurses.refresh();
+                    NCurses.clear();
+                }
+                
+                COORD dwSize = inputRecord.WindowBufferSizeEvent.dwSize;
 
-				// Invoke default handler if no custom handlers attached and
-				// userCanvasSize and userRootElementRect are not defined
+                // Invoke default handler if no custom handlers attached and
+                // userCanvasSize and userRootElementRect are not defined
                 if ( TerminalSizeChanged == null
                      && userCanvasSize.IsEmpty
                      && userRootElementRect.IsEmpty ) {
                     OnTerminalSizeChangedDefault(this, new TerminalSizeChangedEventArgs( dwSize.X, dwSize.Y ));
                 } else if ( TerminalSizeChanged != null ) {
-					TerminalSizeChanged.Invoke(this, new TerminalSizeChangedEventArgs(dwSize.X, dwSize.Y));					
+                    TerminalSizeChanged.Invoke(this, new TerminalSizeChangedEventArgs(dwSize.X, dwSize.Y));					
                 }
 
-				// Refresh whole display
-				renderer.FinallyApplyChangesToCanvas( true );
+                // Refresh whole display
+                renderer.FinallyApplyChangesToCanvas( true );
 
                 return;
             }
@@ -971,11 +942,11 @@ namespace ConsoleFramework
                 lock ( actionsLocker ) {
                     actionsToBeInvoked.Add( new ActionInfo( action, waitHandle ) );
                 }
-				if (usingLinux) {
-					Libc.writeInt64 (pipeFds[1], 3);
-				} else {
-                	invokeWaitHandle.Set( );
-				}
+                if (usingLinux) {
+                    Libc.writeInt64 (pipeFds[1], 3);
+                } else {
+                    invokeWaitHandle.Set( );
+                }
 
                 waitHandle.WaitOne( );
             }
@@ -994,12 +965,12 @@ namespace ConsoleFramework
                 actionsToBeInvoked.Add( new ActionInfo( action, null ) );
             }
             if (!IsUiThread()) {
-				if (usingLinux) {
-					Libc.writeInt64 (pipeFds[1], 3);
-				} else {
-                	invokeWaitHandle.Set();
-				}
-			}
+                if (usingLinux) {
+                    Libc.writeInt64 (pipeFds[1], 3);
+                } else {
+                    invokeWaitHandle.Set();
+                }
+            }
         }
 
         private readonly object timersLock = new object(  );
